@@ -5,7 +5,7 @@ pipeline {
     environment {
         SLACK_WEBHOOK = credentials('b010e98e-3667-4fc9-b7e2-5075fce052f8')
         TICKER = "AAPL"
-        THRESHOLD = 1000
+        THRESHOLD = "1000"
     }
 
     stages {
