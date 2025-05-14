@@ -31,8 +31,8 @@ pipeline {
             steps {
                 script {
                     withEnv([
-                        "TICKER=${TICKER}"
-                        "THRESHOLD=${THRESHOLD}"
+                        "TICKER=${TICKER}",
+                        "THRESHOLD=${THRESHOLD}",
                         "SLACK_WEBHOOK=${SLACK_WEBHOOK}"
                     ]) {
                         sh """
