@@ -46,5 +46,12 @@ pipeline {
                 }
             }
         }
+        stage("Archive Logs") {
+            steps {
+                script {
+                    archiveArtifacts artifacts: 'stock_log.csv', fingerprint: true
+                }
+            }
+        }
     }
 }

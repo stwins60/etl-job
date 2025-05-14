@@ -3,6 +3,7 @@ import yfinance as yf
 import requests
 import os
 from dotenv import load_dotenv
+import csv
 
 load_dotenv()
 
@@ -26,8 +27,10 @@ def send_slack_alert(message, webhook_url):
 
 def log_result(ticker, price, threshold, condition):
     timestamp = datetime.datetime.now().isoformat()
-    with open("stock_log.csv", "a") as log_file:
-        log_file.write(f"{timestamp},{ticker},{price},{threshold},{condition}")
+    with open("stock_log.csv", "a") as f:
+        writer = csv.writer(f)
+        writer.writerow([timestamp, ticker, price, threshold, condition])
+        # log_file.write(f"{timestamp},{ticker},{price},{threshold},{condition}")
 
 if __name__ == "__main__":
     tickers = os.getenv("TICKERS").split(",")
