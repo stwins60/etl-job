@@ -1,3 +1,4 @@
+import datetime
 import yfinance as yf
 import requests
 import os
@@ -32,17 +33,34 @@ def send_slack_alert(ticker, price, threshold, webhook_url):
     response = requests.post(webhook_url, json=message, headers=headers)
     response.raise_for_status()
 
+def log_result(ticker, price, threshold, condition):
+    timestamp = datetime.datetime.now().isoformat()
+    with open("stock_log.csv", "a") as log_file:
+        log_file.write(f"{timestamp},{ticker},{price},{threshold},{condition}")
+
 if __name__ == "__main__":
-    ticker = os.getenv("TICKER")
+    tickers = os.getenv("TICKERS").split(",")
     threshold = float(os.getenv("THRESHOLD"))
     webhook_url = os.getenv("SLACK_WEBHOOK")
 
-    price = get_stock_price(ticker)
+    for ticker in tickers:
+        ticker = ticker.strip().upper()
+        price = get_stock_price(ticker)
+        exceeded = price > threshold
 
-    print(f"[INFO] Current price if {ticker}: ${price:.2f}")
-    if price > threshold:
-        print(f"[ALERT] {ticker} price ${price:.2f} > threshold of ${threshold:.2f}")
-        send_slack_alert(ticker, price, threshold, webhook_url)
-    else:
-        print(f"[ALERT] {ticker} price ${price:.2f} <= threshold of ${threshold:.2f}")
-        send_slack_alert(ticker, price, threshold, webhook_url)
+        # Determine message and log entry
+        if exceeded:
+            message = f":chart_with_upwards_trend: *{ticker}* is at *${price:.2f}*, above the threshold of *${threshold:.2f}*."
+            condition = "ABOVE"
+        else:
+            message = f":warning: *{ticker}* is at *${price:.2f}*, below or equal to the threshold of *${threshold:.2f}*."
+            condition = "BELOW_OR_EQUAL"
+
+        # Send Slack notification
+        send_slack_alert(message, webhook_url)
+
+        # Log result
+        log_result(ticker, price, threshold, condition)
+
+        # Print for Jenkins console logs
+        print(f"[{condition}] {ticker} @ ${price:.2f} (Threshold: ${threshold:.2f})")
