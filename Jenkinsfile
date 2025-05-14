@@ -21,7 +21,7 @@ pipeline {
                 script {
                     sh """
                         python3 -m venv venv
-                        source venv/bin/activate
+                        . venv/bin/activate
                         pip install -r requirements.txt
                     """
                 }
@@ -36,7 +36,7 @@ pipeline {
                         "SLACK_WEBHOOK=${SLACK_WEBHOOK}"
                     ]) {
                         sh """
-                            source venv/bin/activate
+                            . venv/bin/activate
                             python3 app.py
                         """
                     }
